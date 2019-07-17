@@ -31,21 +31,49 @@
 // render(<App />, window.document.getElementById('app'));
 
 import { createStore } from 'redux';
-import { log } from 'util';
 
-const reducer = (state,action) => {
+const initialState = {
+    result:1,
+    lastValues: [],
+    userName : 'Max'
+}
+
+//this is mutable approach
+/*
+const reducer = (state = initialState,action) => {
     switch (action.type){
         case 'ADD':
-            state = state + action.payload;
+            state.result += action.payload;
             break;
         case 'SUBTRACT':
-            state = state - action.payload;
+            state.result -= action.payload;
+            break;
+    };
+    return state;
+};
+*/
+//this is immutable approach
+const reducer = (state = initialState,action) => {
+    switch (action.type){
+        case 'ADD':
+            state = {
+                ...state,
+                result: state.result + action.payload,
+                lastValues: [...state.lastValues,action.payload]
+            };
+            break;
+        case 'SUBTRACT':
+            state = {
+                ...state,
+                result: state.result - action.payload,
+                lastValues: [...state.lastValues,action.payload]
+            };
             break;
     };
     return state;
 };
 
-const store = createStore(reducer,1);
+const store = createStore(reducer);
 
 store.subscribe(()=>{
     console.log("Store updated! ", store.getState());
@@ -57,6 +85,11 @@ store.dispatch({
 });
 
 store.dispatch({
+    type:"ADD",
+    payload : 42
+});
+
+store.dispatch({
     type:"SUBTRACT",
-    payload : 10
-})
+    payload : 80
+});
